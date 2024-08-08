@@ -86,36 +86,20 @@ app.delete('/api/persons/:id', (request, response) => {
 
 // Adding persons funcionality
 app.post('/api/persons', (request, response) => {
-    const generateId = () =>  Math.floor(Math.random() * 3000)
-    const existingNames = persons.map(person => person.name)
     const body = request.body
-// Handle insert errors
-    if (!body.name) {
-        return response.status(400).json({
-            error: 'Name is missing'
-        })
-    }
-    
-    if (!body.number) {
-        return response.status(400).json({
-            error: 'Number is missing'
-        })
+
+    if (body.name === undefined) {
+        return response.status(400).json({error: 'name missing'})
     }
 
-    if (existingNames.includes(body.name)) {
-        return response.status(400).json({
-            error: "Name must be unique"
-        })
-    }
-// Create new Entry
-    const person = {
+    const phone = new Phone({
         name: body.name,
-        number: body.number,
-        id: generateId()
-    }
+        number: body.number
+    })
 
-    persons = persons.concat(person)
-    response.json(person)
+    phone.save().then(savedPhone => {
+        response.json(savedPhone)
+    })
 })
 
 const PORT = process.env.PORT || 3001

@@ -1,3 +1,4 @@
+const Phone = require('./models/phonebook')
 const express = require('express')
 const app = express()
 const cors = require('cors')
@@ -5,6 +6,7 @@ const morgan = require('morgan')
 app.use(express.static('dist'))
 app.use(cors())
 app.use(express.json())
+
 app.use(morgan(function (tokens, req, res) {
     if (req.method === 'POST') {
         return [
@@ -26,7 +28,9 @@ app.use(morgan(function (tokens, req, res) {
     }
 }))
 
-let persons = [
+
+
+/*let persons = [
     { 
       "id": "1",
       "name": "Arto Hellas", 
@@ -47,7 +51,7 @@ let persons = [
       "name": "Mary Poppendieck", 
       "number": "39-23-6423122"
     }
-]
+]*/
 
 // /api/info route to return time of request and how many pieces of information
 app.get('/api/info', (request, response) => {
@@ -58,20 +62,19 @@ app.get('/api/info', (request, response) => {
 
 //retrieve persons from /api/persons
 app.get('/api/persons', (request,response) => {
-    response.json(persons)
+    Phone.find({}).then (phones => {
+        response.json(phones)
+    })
 })
 
 // Retrieving a single entry by id
 app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    const person = persons.find(person => person.id === id)
-
-    if (person) {
-        response.json(person)
-    } else {
-        response.status(404).end()
+    Phone.findById(request.params.id)
+        .then(phone => {
+            response.json(phone)
+        })
     }
-})
+)
 
 //Deleting a single entry by id
 app.delete('/api/persons/:id', (request, response) => {

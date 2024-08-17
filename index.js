@@ -32,6 +32,14 @@ app.get('/api/persons', (request, response) => {
     response.json(persons)
 })
 
+// /api/info return info and date
+app.get('/info', (request, response) => {
+    const date = new Date()
+    const message = `<p>Phonebook has info for ${persons.length} people <br /> ${date}`
+
+    response.send(message)
+})
+
 
 
 //Define port and listener

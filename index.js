@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 
 // Initialize Data
-const persons = [
+let persons = [
     { 
       "id": "1",
       "name": "Arto Hellas", 

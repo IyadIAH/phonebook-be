@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+
 // Initialize Data
 let persons = [
     { 
@@ -24,6 +26,8 @@ let persons = [
       "number": "39-23-6423122"
     }
 ]
+
+const generateId = () => {return String(Math.floor(Math.random() * 2500))}
 
 //Define Routes
 
@@ -59,6 +63,38 @@ app.delete('/api/persons/:id', (request, response) => {
 
     response.status(204).end()
     
+})
+
+// implement adding an entry
+app.post('/api/persons/', (request, response) => {
+    const body = request.body
+
+    if (!body.name) {
+        return response.status(400).json({
+            error: 'name is missing'
+        })
+    }
+
+    if (!body.number) {
+        return response.status(400).json({
+            error: 'number is missing'
+        })
+    }
+
+    if (persons.some(person => person.name === body.name)) {
+        return response.status(400).json({
+            error: `${body.name} already exists in Phonebook`
+        })
+    }
+
+    const person = {
+        name: body.name,
+        number: body.number,
+        id: generateId()
+    }
+
+    persons = persons.concat(person)
+    response.json(person)
 })
 
 

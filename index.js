@@ -2,6 +2,19 @@ const express = require('express')
 const app = express()
 
 app.use(express.json())
+// Morgan Middleware
+const morgan = require('morgan')
+morgan.token('postData', function getPost (req) {
+    if (req.method === 'POST') {
+        return JSON.stringify(req.body)
+    } else {
+        return null
+    }
+    
+})
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :postData'))
+
+
 
 // Initialize Data
 let persons = [
@@ -96,6 +109,8 @@ app.post('/api/persons/', (request, response) => {
     persons = persons.concat(person)
     response.json(person)
 })
+
+//Morgan Middleware
 
 
 //Define port and listener

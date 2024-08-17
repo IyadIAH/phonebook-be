@@ -26,11 +26,6 @@ const persons = [
 ]
 
 //Define Routes
-// /api/persons return persons
-
-app.get('/api/persons', (request, response) => {
-    response.json(persons)
-})
 
 // /api/info return info and date
 app.get('/info', (request, response) => {
@@ -40,6 +35,18 @@ app.get('/info', (request, response) => {
     response.send(message)
 })
 
+// /api/persons return persons
+app.get('/api/persons', (request, response) => {
+    response.json(persons)
+})
+
+// /api/persons/id return entry
+app.get('/api/persons/:id', (request, response) => {
+    const id = request.params.id
+    const person = persons.find(p => p.id === id)
+
+    response.json(person)
+})
 
 
 //Define port and listener

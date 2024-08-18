@@ -14,8 +14,6 @@ morgan.token('postData', function getPost (req) {
 })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :postData'))
 
-
-
 // Initialize Data
 let persons = [
     { 
@@ -82,15 +80,9 @@ app.delete('/api/persons/:id', (request, response) => {
 app.post('/api/persons/', (request, response) => {
     const body = request.body
 
-    if (!body.name) {
+    if (!body.name || !body.number) {
         return response.status(400).json({
-            error: 'name is missing'
-        })
-    }
-
-    if (!body.number) {
-        return response.status(400).json({
-            error: 'number is missing'
+            error: !body.name ? 'name is missing' : 'number is missing'
         })
     }
 
@@ -109,9 +101,6 @@ app.post('/api/persons/', (request, response) => {
     persons = persons.concat(person)
     response.json(person)
 })
-
-//Morgan Middleware
-
 
 //Define port and listener
 const PORT = 3001

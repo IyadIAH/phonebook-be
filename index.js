@@ -52,38 +52,41 @@ const generateId = () => {return String(Math.floor(Math.random() * 2500))}
 // /api/info return info and date
 app.get('/info', (request, response) => {
     const date = new Date()
-    const message = `<p>Phonebook has info for ${persons.length} people <br /> ${date}`
+    const number = Person.find({}).then(results => { const message = `<p>Phonebook has info for ${results.length} people. <br /> ${date}</p>`
+    
+        response.send(message) })
 
-    response.send(message)
 })
 
 // /api/persons return persons
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
     Person.find({})
         .then(people => {
             response.json(people)
         })
+        .catch(error => next(error))
 })
 
 // /api/persons/id return entry
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id)
         .then(person => {
             response.json(person)
         })
+        .catch(error => next(error))
 })
 
 // implement delete entry
-app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    persons = persons.filter(person => person.id !== id)
-
-    response.status(204).end()
-    
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndDelete(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
 // implement adding an entry
-app.post('/api/persons/', (request, response) => {
+app.post('/api/persons/', (request, response, next) => {
     const body = request.body
 
     if (!body.name || !body.number) {
@@ -101,7 +104,33 @@ app.post('/api/persons/', (request, response) => {
         .then(savedPerson => {
             response.json(savedPerson)
         })
+        .catch(error => next(error))
 })
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+
+    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+        .then(returnedPerson => {
+            response.json(returnedPerson)
+        })
+        .catch(error => next(error))
+}) 
+
+const errorHandler = (error, request, response, next) => {
+    console.log(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformed if'})
+    }
+    next(error)
+}
+app.use(errorHandler)
 
 //Define port and listener
 const PORT = process.env.PORT || 3001
